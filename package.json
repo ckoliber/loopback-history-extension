@@ -1,0 +1,48 @@
+{
+    "name": "loopback-history-extension",
+    "version": "0.1.0",
+    "description": "DataModels with history extension for Loopback v4",
+    "keywords": [
+        "loopback-extension",
+        "loopback"
+    ],
+    "main": "index.js",
+    "engines": {
+        "node": ">=8.9"
+    },
+    "scripts": {
+        "build": "lb-tsc",
+        "build:watch": "lb-tsc --watch --outDir build",
+        "clean": "lb-clean build *.tsbuildinfo",
+        "pretest": "npm run clean && npm run build",
+        "test": "lb-mocha --allow-console-logs \"build/__tests__\"",
+        "test:dev": "lb-mocha --allow-console-logs build/__tests__/**/*.js",
+        "prepublishOnly": "npm run test"
+    },
+    "repository": {
+        "type": "git"
+    },
+    "author": "KoLiBer",
+    "license": "MIT",
+    "files": [
+        "README.md",
+        "index.js",
+        "index.d.ts",
+        "build",
+        "src",
+        "!*/__tests__"
+    ],
+    "dependencies": {
+        "@loopback/boot": "^1.5.9",
+        "@loopback/context": "^1.23.3",
+        "@loopback/core": "^1.10.5",
+        "@loopback/repository": "^1.15.2"
+    },
+    "devDependencies": {
+        "@loopback/build": "^2.0.14",
+        "source-map-support": "^0.5.13",
+        "@loopback/testlab": "^1.9.2",
+        "@types/node": "^10.14.20",
+        "typescript": "~3.6.3"
+    }
+}
