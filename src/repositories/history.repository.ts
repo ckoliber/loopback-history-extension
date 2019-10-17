@@ -76,34 +76,41 @@ export class HistoryCrudRepository<
      */
     async find(
         filter?: Filter<Model>,
-        HistoryOptions?: HistoryOptions
+        options?: HistoryOptions
     ): Promise<(Model & ModelRelations)[]> {
-        return super.find(filter, HistoryOptions);
+        if (options && options.crud) {
+            return super.find(filter, options);
+        }
     }
     async findOne(
         filter?: Filter<Model>,
-        HistoryOptions?: HistoryOptions
+        options?: HistoryOptions
     ): Promise<(Model & ModelRelations) | null> {
-        return super.findOne(filter, HistoryOptions);
+        if (options && options.crud) {
+            return super.findOne(filter, options);
+        }
     }
     async findById(
         id: string,
         filter?: Filter<Model>,
-        HistoryOptions?: HistoryOptions
+        options?: HistoryOptions
     ): Promise<Model & ModelRelations> {
-        return super.findById(id, filter, HistoryOptions);
+        if (options && options.crud) {
+            return super.findById(id, filter, options);
+        }
     }
     async count(
         where?: Where<Model>,
         HistoryOptions?: HistoryOptions
     ): Promise<Count> {
-        return super.count(where, HistoryOptions);
+        if (options && options.crud) {
+            return super.count(where, HistoryOptions);
+        }
     }
-    async exists(
-        id: string,
-        HistoryOptions?: HistoryOptions
-    ): Promise<boolean> {
-        return super.exists(id, HistoryOptions);
+    async exists(id: string, options?: HistoryOptions): Promise<boolean> {
+        if (options && options.crud) {
+            return super.exists(id, options);
+        }
     }
 
     /**
