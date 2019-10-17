@@ -27,6 +27,9 @@ export class HistoryCrudRepository<
         super(entityClass, dataSource);
     }
 
+    /**
+     * Create methods
+     */
     private async createHistory(
         entities: DataObject<Model>[],
         options?: HistoryOptions
@@ -68,6 +71,9 @@ export class HistoryCrudRepository<
         return this.createHistory(entities, options);
     }
 
+    /**
+     * Read methods
+     */
     async find(
         filter?: Filter<Model>,
         HistoryOptions?: HistoryOptions
@@ -100,6 +106,9 @@ export class HistoryCrudRepository<
         return super.exists(id, HistoryOptions);
     }
 
+    /**
+     * Update methods
+     */
     private async updateHistory(
         data: DataObject<Model>,
         replace: boolean,
@@ -208,6 +217,9 @@ export class HistoryCrudRepository<
         );
     }
 
+    /**
+     * Delete methods
+     */
     private async deleteHistory(
         where: Where,
         options?: HistoryOptions
