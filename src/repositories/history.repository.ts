@@ -81,6 +81,18 @@ export class HistoryCrudRepository<
         if (options && options.crud) {
             return super.find(filter, options);
         }
+
+        return super.find(
+            {
+                ...filter,
+                where: {
+                    and: filter
+                        ? [filter.where, { endDate: null }]
+                        : [{ endDate: null }]
+                }
+            } as any,
+            options
+        );
     }
     async findOne(
         filter?: Filter<Model>,
@@ -89,6 +101,18 @@ export class HistoryCrudRepository<
         if (options && options.crud) {
             return super.findOne(filter, options);
         }
+
+        return super.findOne(
+            {
+                ...filter,
+                where: {
+                    and: filter
+                        ? [filter.where, { endDate: null }]
+                        : [{ endDate: null }]
+                }
+            } as any,
+            options
+        );
     }
     async findById(
         id: string,
@@ -98,6 +122,18 @@ export class HistoryCrudRepository<
         if (options && options.crud) {
             return super.findById(id, filter, options);
         }
+
+        return super.findOne(
+            {
+                ...filter,
+                where: {
+                    and: filter
+                        ? [filter.where, { endDate: null }]
+                        : [{ endDate: null }]
+                }
+            } as any,
+            options
+        );
     }
     async count(
         where?: Where<Model>,
