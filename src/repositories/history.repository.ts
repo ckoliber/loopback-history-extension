@@ -5,14 +5,15 @@ import {
     Options,
     Filter,
     Where,
-    Count
+    Count,
+    EntityNotFoundError
 } from "@loopback/repository";
 
 import { HistoryEntity, HistoryEntityRelations } from "../models";
 
 export interface HistoryOptions extends Options {
     crud?: true;
-    date?: Date;
+    maxDate?: Date;
 }
 export class HistoryCrudRepository<
     Model extends HistoryEntity,
@@ -74,6 +75,31 @@ export class HistoryCrudRepository<
     /**
      * Read methods
      */
+    private async findHistory(
+        group: boolean,
+        filter: Filter,
+        options?: HistoryOptions
+    ): Promise<(Model & ModelRelations)[]> {
+        /**
+         * where: {id:id,endDate<=date|endDate:null}
+         * select(where)
+         * group(beginDate:last)
+         */
+        let result = await super.find(filter as any, options);
+
+        if (group) {
+            // TODO: [groupBy id], [last beginDate], [inOrder]
+            let entities:any = {};
+            result = result.filter(entity => {
+                if () {
+
+                }
+                entities[entity.id]
+            });
+        }
+
+        return result;
+    }
     async find(
         filter?: Filter<Model>,
         options?: HistoryOptions
@@ -82,15 +108,20 @@ export class HistoryCrudRepository<
             return super.find(filter, options);
         }
 
-        return super.find(
+        const maxDate = options && options.maxDate;
+        const endDateCondition = {
+            endDate: maxDate ? { lt: maxDate } : null
+        };
+        return this.findHistory(
+            Boolean(maxDate),
             {
                 ...filter,
                 where: {
                     and: filter
-                        ? [filter.where, { endDate: null }]
-                        : [{ endDate: null }]
+                        ? [filter.where, endDateCondition]
+                        : [endDateCondition]
                 }
-            } as any,
+            },
             options
         );
     }
@@ -102,17 +133,26 @@ export class HistoryCrudRepository<
             return super.findOne(filter, options);
         }
 
-        return super.findOne(
+        const maxDate = options && options.maxDate;
+        const endDateCondition = {
+            endDate: maxDate ? { lt: maxDate } : null
+        };
+        const result = await this.findHistory(
+            Boolean(maxDate),
             {
                 ...filter,
                 where: {
                     and: filter
-                        ? [filter.where, { endDate: null }]
-                        : [{ endDate: null }]
+                        ? [filter.where, endDateCondition]
+                        : [endDateCondition]
                 }
-            } as any,
+            },
             options
         );
+        if (result[0]) {
+            return result[0];
+        }
+        return null;
     }
     async findById(
         id: string,
@@ -123,30 +163,74 @@ export class HistoryCrudRepository<
             return super.findById(id, filter, options);
         }
 
-        return super.findOne(
+        const maxDate = options && options.maxDate;
+        const endDateCondition = {
+            endDate: maxDate ? { lt: maxDate } : null
+        };
+        const result = await this.findHistory(
+            Boolean(maxDate),
             {
                 ...filter,
                 where: {
                     and: filter
-                        ? [filter.where, { endDate: null }]
-                        : [{ endDate: null }]
+                        ? [filter.where, endDateCondition]
+                        : [endDateCondition]
                 }
-            } as any,
+            },
             options
         );
+        if (result[0]) {
+            return result[0];
+        }
+        throw new EntityNotFoundError(this.entityClass, id);
     }
     async count(
         where?: Where<Model>,
-        HistoryOptions?: HistoryOptions
+        options?: HistoryOptions
     ): Promise<Count> {
         if (options && options.crud) {
-            return super.count(where, HistoryOptions);
+            return super.count(where, options);
         }
+
+        const maxDate = options && options.maxDate;
+        const endDateCondition = {
+            endDate: maxDate ? { lt: maxDate } : null
+        };
+        const result = await this.findHistory(
+            Boolean(maxDate),
+            {
+                where: {
+                    and: [where, endDateCondition]
+                }
+            },
+            options
+        );
+        return {
+            count: result.length
+        };
     }
     async exists(id: string, options?: HistoryOptions): Promise<boolean> {
         if (options && options.crud) {
             return super.exists(id, options);
         }
+
+        const maxDate = options && options.maxDate;
+        const endDateCondition = {
+            endDate: maxDate ? { lt: maxDate } : null
+        };
+        const result = await this.findHistory(
+            Boolean(maxDate),
+            {
+                where: {
+                    and: [{ id: id }, endDateCondition]
+                }
+            },
+            options
+        );
+        if (result[0]) {
+            return true;
+        }
+        return false;
     }
 
     /**
