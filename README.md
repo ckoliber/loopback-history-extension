@@ -27,9 +27,12 @@ npm i --save loopback-history-extension
 
 ## Usage
 
-1. Change your model parent class from `Entity` to `HistoryEntity`, then remove `id` property from your model declaration
+### History Model
 
-### Example
+1. Change your model parent class from `Entity` to `HistoryEntity`
+2. Remove `id` property from your model declaration
+
+#### Example
 
 Change your model from:
 
@@ -76,9 +79,44 @@ export class User extends HistoryEntity {
 
 ---
 
-2. Change your repository parent class from `DefaultCrudRepository` to `HistoryCrudRepository`
+#### Tip
 
-### Example
+Don't use `unique` columns in your models
+
+Convert your model from:
+
+```ts
+export class User extends Entity {
+    @property({
+        type: "string",
+        required: true,
+        index: {
+            unique: true
+        }
+    })
+    username: string;
+}
+```
+
+To:
+
+```ts
+export class User extends HistoryEntity {
+    @property({
+        type: "string",
+        required: true
+    })
+    username: string;
+}
+```
+
+---
+
+### History Repository
+
+Change your repository parent class from `DefaultCrudRepository` to `HistoryCrudRepository`
+
+#### Example
 
 Change your repository from:
 
