@@ -1,1 +1,1 @@
-export * from "./history.respository";
+export * from "./history.repository";
