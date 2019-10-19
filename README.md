@@ -13,7 +13,7 @@ A good approach for saving history is about adding some columns to your tables:
 -   Per every `Update` we will invalid last history, create new record
 -   Per every `Delete` we will invalid last history
 
-Now using this simple extension you can add all history features to your models and repositories.
+Now, using this simple extension you can add all history features to your models and repositories.
 
 ---
 
