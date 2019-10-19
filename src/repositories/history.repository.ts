@@ -88,14 +88,21 @@ export class HistoryCrudRepository<
         let result = await super.find(filter as any, options);
 
         if (group) {
-            // TODO: [groupBy id], [last beginDate], [inOrder]
-            let entities:any = {};
-            result = result.filter(entity => {
-                if () {
-
+            // find last entities group by id and save last entities in object
+            let lastEntities: any = {};
+            result.forEach(entity => {
+                if (
+                    !lastEntities[entity.id] ||
+                    lastEntities[entity.id].beginDate < entity.beginDate
+                ) {
+                    lastEntities[entity.id] = entity;
                 }
-                entities[entity.id]
             });
+
+            // filter only last entity of every group (by id)
+            result = result.filter(
+                entity => lastEntities[entity.id].uid === entity.uid
+            );
         }
 
         return result;
