@@ -264,7 +264,12 @@ export class HistoryCrudRepository<
          */
         const date = new Date();
 
-        const entities = await super.find(where as any, options);
+        const entities = await super.find(
+            {
+                where: where as any
+            },
+            options
+        );
 
         await super.createAll(
             entities.map(entity => ({
