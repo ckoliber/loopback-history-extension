@@ -51,6 +51,7 @@ export class HistoryCrudRepository<
             options
         );
     }
+
     async create(
         entity: DataObject<Model>,
         options?: HistoryOptions
@@ -61,6 +62,7 @@ export class HistoryCrudRepository<
 
         return (await this.createHistory([entity], options))[0];
     }
+
     async createAll(
         entities: DataObject<Model>[],
         options?: HistoryOptions
@@ -107,6 +109,7 @@ export class HistoryCrudRepository<
 
         return result;
     }
+
     async find(
         filter?: Filter<Model>,
         options?: HistoryOptions
@@ -132,6 +135,7 @@ export class HistoryCrudRepository<
             options
         );
     }
+
     async findOne(
         filter?: Filter<Model>,
         options?: HistoryOptions
@@ -161,6 +165,7 @@ export class HistoryCrudRepository<
         }
         return null;
     }
+
     async findById(
         id: string,
         filter?: Filter<Model>,
@@ -191,6 +196,7 @@ export class HistoryCrudRepository<
         }
         throw new EntityNotFoundError(this.entityClass, id);
     }
+
     async count(
         where?: Where<Model>,
         options?: HistoryOptions
@@ -216,6 +222,7 @@ export class HistoryCrudRepository<
             count: result.length
         };
     }
+
     async exists(id: string, options?: HistoryOptions): Promise<boolean> {
         if (options && options.crud) {
             return super.exists(id, options);
@@ -279,6 +286,7 @@ export class HistoryCrudRepository<
             options
         );
     }
+
     async update(entity: Model, options?: HistoryOptions): Promise<void> {
         if (options && options.crud) {
             return super.update(entity, options);
@@ -294,6 +302,7 @@ export class HistoryCrudRepository<
             options
         );
     }
+
     async updateAll(
         data: DataObject<Model>,
         where?: Where<Model>,
@@ -312,6 +321,7 @@ export class HistoryCrudRepository<
             options
         );
     }
+
     async updateById(
         id: string,
         data: DataObject<Model>,
@@ -331,6 +341,7 @@ export class HistoryCrudRepository<
             options
         );
     }
+
     async replaceById(
         id: string,
         data: DataObject<Model>,
@@ -368,6 +379,7 @@ export class HistoryCrudRepository<
             options
         );
     }
+
     async delete(entity: Model, options?: HistoryOptions): Promise<void> {
         if (options && options.crud) {
             return super.delete(entity, options);
@@ -375,6 +387,7 @@ export class HistoryCrudRepository<
 
         await this.deleteHistory({ id: entity.id, endDate: null }, options);
     }
+
     async deleteAll(
         where?: Where<Model>,
         options?: HistoryOptions
@@ -395,6 +408,7 @@ export class HistoryCrudRepository<
             options
         );
     }
+
     async deleteById(id: string, options?: HistoryOptions): Promise<void> {
         if (options && options.crud) {
             return super.deleteById(id, options);
