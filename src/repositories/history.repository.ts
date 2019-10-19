@@ -127,9 +127,7 @@ export class HistoryCrudRepository<
             {
                 ...filter,
                 where: {
-                    and: filter
-                        ? [filter.where, endDateCondition]
-                        : [endDateCondition]
+                    and: [filter && filter.where, endDateCondition]
                 }
             },
             options
@@ -153,9 +151,7 @@ export class HistoryCrudRepository<
             {
                 ...filter,
                 where: {
-                    and: filter
-                        ? [filter.where, endDateCondition]
-                        : [endDateCondition]
+                    and: [filter && filter.where, endDateCondition]
                 }
             },
             options
@@ -184,9 +180,7 @@ export class HistoryCrudRepository<
             {
                 ...filter,
                 where: {
-                    and: filter
-                        ? [filter.where, endDateCondition]
-                        : [endDateCondition]
+                    and: [filter && filter.where, endDateCondition]
                 }
             },
             options
@@ -301,8 +295,7 @@ export class HistoryCrudRepository<
             entity,
             false,
             {
-                id: entity.id,
-                endDate: null
+                and: [{ id: entity.id }, { endDate: null }]
             },
             options
         );
@@ -340,8 +333,7 @@ export class HistoryCrudRepository<
             data,
             false,
             {
-                id: id,
-                endDate: null
+                and: [{ id: id }, { endDate: null }]
             },
             options
         );
@@ -360,8 +352,7 @@ export class HistoryCrudRepository<
             data,
             true,
             {
-                id: id,
-                endDate: null
+                and: [{ id: id }, { endDate: null }]
             },
             options
         );
@@ -390,7 +381,12 @@ export class HistoryCrudRepository<
             return super.delete(entity, options);
         }
 
-        await this.deleteHistory({ id: entity.id, endDate: null }, options);
+        await this.deleteHistory(
+            {
+                and: [{ id: entity.id }, { endDate: null }]
+            },
+            options
+        );
     }
 
     async deleteAll(
@@ -403,12 +399,7 @@ export class HistoryCrudRepository<
 
         return this.deleteHistory(
             {
-                and: [
-                    where,
-                    {
-                        endDate: null
-                    }
-                ]
+                and: [where, { endDate: null }]
             },
             options
         );
@@ -419,6 +410,11 @@ export class HistoryCrudRepository<
             return super.deleteById(id, options);
         }
 
-        await this.deleteHistory({ id: id, endDate: null }, options);
+        await this.deleteHistory(
+            {
+                and: [{ id: id }, { endDate: null }]
+            },
+            options
+        );
     }
 }
