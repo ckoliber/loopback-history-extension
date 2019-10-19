@@ -5,16 +5,20 @@ import {
     Options,
     Filter,
     Where,
-    Count
+    Count,
+    EntityNotFoundError
 } from "@loopback/repository";
 
 import { HistoryEntity, HistoryEntityRelations } from "../models";
 
+export interface HistoryOptions extends Options {
+    crud?: true;
+    maxDate?: Date;
+}
 export class HistoryCrudRepository<
     Model extends HistoryEntity,
-    ID,
     ModelRelations extends HistoryEntityRelations
-> extends DefaultCrudRepository<Model, ID, ModelRelations> {
+> extends DefaultCrudRepository<Model, string, ModelRelations> {
     constructor(
         entityClass: typeof HistoryEntity & {
             prototype: Model;
@@ -24,97 +28,392 @@ export class HistoryCrudRepository<
         super(entityClass, dataSource);
     }
 
-    async create(entity: DataObject<Model>, options?: Options): Promise<Model> {
-        /** uid, id => uuidv4 */
-        /** beginDate => now */
-        /** endDate => null */
-        delete entity.uid;
-        entity.beginDate = new Date();
-        delete entity.endDate;
-        delete entity.id;
-
-        return super.create(entity, options);
-    }
-    async createAll(
+    /**
+     * Create methods
+     */
+    private async createHistory(
         entities: DataObject<Model>[],
-        options?: Options
+        options?: HistoryOptions
     ): Promise<Model[]> {
+        /**
+         * create(uid:null,beginDate:$now,endDate:null,id:null)
+         */
         const date = new Date();
 
-        entities = entities.map(entity => {
-            /** uid, id => uuidv4 */
-            /** beginDate => now */
-            /** endDate => null */
-            delete entity.uid;
-            entity.beginDate = date;
-            delete entity.endDate;
-            delete entity.id;
+        return super.createAll(
+            entities.map(entity => ({
+                ...entity,
+                uid: undefined,
+                beginDate: date,
+                endDate: null,
+                id: undefined
+            })),
+            options
+        );
+    }
 
-            return entity;
-        });
+    async create(
+        entity: DataObject<Model>,
+        options?: HistoryOptions
+    ): Promise<Model> {
+        if (options && options.crud) {
+            return super.create(entity, options);
+        }
 
-        return super.createAll(entities, options);
+        return (await this.createHistory([entity], options))[0];
+    }
+
+    async createAll(
+        entities: DataObject<Model>[],
+        options?: HistoryOptions
+    ): Promise<Model[]> {
+        if (options && options.crud) {
+            return super.createAll(entities, options);
+        }
+
+        return this.createHistory(entities, options);
+    }
+
+    /**
+     * Read methods
+     */
+    private async findHistory(
+        group: boolean,
+        filter: Filter,
+        options?: HistoryOptions
+    ): Promise<(Model & ModelRelations)[]> {
+        /**
+         * where: {id:id,endDate<=date|endDate:null}
+         * select(where)
+         * group(beginDate:last)
+         */
+        let result = await super.find(filter as any, options);
+
+        if (group) {
+            // find last entities group by id and save last entities in object
+            let lastEntities: any = {};
+            result.forEach(entity => {
+                if (
+                    !lastEntities[entity.id] ||
+                    lastEntities[entity.id].beginDate < entity.beginDate
+                ) {
+                    lastEntities[entity.id] = entity;
+                }
+            });
+
+            // filter only last entity of every group (by id)
+            result = result.filter(
+                entity => lastEntities[entity.id].uid === entity.uid
+            );
+        }
+
+        return result;
     }
 
     async find(
         filter?: Filter<Model>,
-        options?: Options
+        options?: HistoryOptions
     ): Promise<(Model & ModelRelations)[]> {
-        return super.find(filter, options);
-    }
-    async findOne(
-        filter?: Filter<Model>,
-        options?: Options
-    ): Promise<(Model & ModelRelations) | null> {
-        return super.findOne(filter, options);
-    }
-    async findById(
-        id: ID,
-        filter?: Filter<Model>,
-        options?: Options
-    ): Promise<Model & ModelRelations> {
-        return super.findById(id, filter, options);
+        if (options && options.crud) {
+            return super.find(filter, options);
+        }
+
+        const maxDate = options && options.maxDate;
+        const endDateCondition = {
+            endDate: maxDate ? { lt: maxDate } : null
+        };
+        return this.findHistory(
+            Boolean(maxDate),
+            {
+                ...filter,
+                where: {
+                    and: filter
+                        ? [filter.where, endDateCondition]
+                        : [endDateCondition]
+                }
+            },
+            options
+        );
     }
 
-    async update(entity: Model, options?: Options): Promise<void> {
-        return super.update(entity, options);
+    async findOne(
+        filter?: Filter<Model>,
+        options?: HistoryOptions
+    ): Promise<(Model & ModelRelations) | null> {
+        if (options && options.crud) {
+            return super.findOne(filter, options);
+        }
+
+        const maxDate = options && options.maxDate;
+        const endDateCondition = {
+            endDate: maxDate ? { lt: maxDate } : null
+        };
+        const result = await this.findHistory(
+            Boolean(maxDate),
+            {
+                ...filter,
+                where: {
+                    and: filter
+                        ? [filter.where, endDateCondition]
+                        : [endDateCondition]
+                }
+            },
+            options
+        );
+        if (result[0]) {
+            return result[0];
+        }
+        return null;
     }
+
+    async findById(
+        id: string,
+        filter?: Filter<Model>,
+        options?: HistoryOptions
+    ): Promise<Model & ModelRelations> {
+        if (options && options.crud) {
+            return super.findById(id, filter, options);
+        }
+
+        const maxDate = options && options.maxDate;
+        const endDateCondition = {
+            endDate: maxDate ? { lt: maxDate } : null
+        };
+        const result = await this.findHistory(
+            Boolean(maxDate),
+            {
+                ...filter,
+                where: {
+                    and: filter
+                        ? [filter.where, endDateCondition]
+                        : [endDateCondition]
+                }
+            },
+            options
+        );
+        if (result[0]) {
+            return result[0];
+        }
+        throw new EntityNotFoundError(this.entityClass, id);
+    }
+
+    async count(
+        where?: Where<Model>,
+        options?: HistoryOptions
+    ): Promise<Count> {
+        if (options && options.crud) {
+            return super.count(where, options);
+        }
+
+        const maxDate = options && options.maxDate;
+        const endDateCondition = {
+            endDate: maxDate ? { lt: maxDate } : null
+        };
+        const result = await this.findHistory(
+            Boolean(maxDate),
+            {
+                where: {
+                    and: [where, endDateCondition]
+                }
+            },
+            options
+        );
+        return {
+            count: result.length
+        };
+    }
+
+    async exists(id: string, options?: HistoryOptions): Promise<boolean> {
+        if (options && options.crud) {
+            return super.exists(id, options);
+        }
+
+        const maxDate = options && options.maxDate;
+        const endDateCondition = {
+            endDate: maxDate ? { lt: maxDate } : null
+        };
+        const result = await this.findHistory(
+            Boolean(maxDate),
+            {
+                where: {
+                    and: [{ id: id }, endDateCondition]
+                }
+            },
+            options
+        );
+        if (result[0]) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Update methods
+     */
+    private async updateHistory(
+        data: DataObject<Model>,
+        replace: boolean,
+        where: Where,
+        options?: HistoryOptions
+    ): Promise<Count> {
+        /**
+         * where: {id:id,endDate:null}
+         * select(where)
+         * create(uid:null,beginDate:$now,endDate:null)
+         * update(where) => endDate: $now
+         */
+        const date = new Date();
+
+        const entities = await super.find(where as any, options);
+
+        await super.createAll(
+            entities.map(entity => ({
+                ...(replace ? {} : entity),
+                ...data,
+                uid: undefined,
+                beginDate: date,
+                endDate: null,
+                id: entity.id
+            })),
+            options
+        );
+
+        return await super.updateAll(
+            { endDate: date } as any,
+            {
+                uid: { inq: entities.map(entity => entity.uid) }
+            } as any,
+            options
+        );
+    }
+
+    async update(entity: Model, options?: HistoryOptions): Promise<void> {
+        if (options && options.crud) {
+            return super.update(entity, options);
+        }
+
+        await this.updateHistory(
+            entity,
+            false,
+            {
+                id: entity.id,
+                endDate: null
+            },
+            options
+        );
+    }
+
     async updateAll(
         data: DataObject<Model>,
         where?: Where<Model>,
-        options?: Options
+        options?: HistoryOptions
     ): Promise<Count> {
-        return super.updateAll(data, where, options);
+        if (options && options.crud) {
+            return super.updateAll(data, where, options);
+        }
+
+        return this.updateHistory(
+            data,
+            false,
+            {
+                and: [where, { endDate: null }]
+            },
+            options
+        );
     }
+
     async updateById(
-        id: ID,
+        id: string,
         data: DataObject<Model>,
-        options?: Options
+        options?: HistoryOptions
     ): Promise<void> {
-        return super.updateById(id, data, options);
+        if (options && options.crud) {
+            return super.updateById(id, data, options);
+        }
+
+        await this.updateHistory(
+            data,
+            false,
+            {
+                id: id,
+                endDate: null
+            },
+            options
+        );
     }
+
     async replaceById(
-        id: ID,
+        id: string,
         data: DataObject<Model>,
-        options?: Options
+        options?: HistoryOptions
     ): Promise<void> {
-        return super.replaceById(id, data, options);
+        if (options && options.crud) {
+            return super.replaceById(id, data, options);
+        }
+
+        await this.updateHistory(
+            data,
+            true,
+            {
+                id: id,
+                endDate: null
+            },
+            options
+        );
     }
 
-    async delete(entity: Model, options?: Options): Promise<void> {
-        return super.delete(entity, options);
-    }
-    async deleteAll(where?: Where<Model>, options?: Options): Promise<Count> {
-        return super.deleteAll(where, options);
-    }
-    async deleteById(id: ID, options?: Options): Promise<void> {
-        return super.deleteById(id, options);
+    /**
+     * Delete methods
+     */
+    private async deleteHistory(
+        where: Where,
+        options?: HistoryOptions
+    ): Promise<Count> {
+        /**
+         * where: {id:id,endDate:null}
+         * update(where) => endDate: $now
+         */
+        return super.updateAll(
+            { endDate: new Date() } as any,
+            where as any,
+            options
+        );
     }
 
-    async count(where?: Where<Model>, options?: Options): Promise<Count> {
-        return super.count(where, options);
+    async delete(entity: Model, options?: HistoryOptions): Promise<void> {
+        if (options && options.crud) {
+            return super.delete(entity, options);
+        }
+
+        await this.deleteHistory({ id: entity.id, endDate: null }, options);
     }
-    async exists(id: ID, options?: Options): Promise<boolean> {
-        return super.exists(id, options);
+
+    async deleteAll(
+        where?: Where<Model>,
+        options?: HistoryOptions
+    ): Promise<Count> {
+        if (options && options.crud) {
+            return super.deleteAll(where, options);
+        }
+
+        return this.deleteHistory(
+            {
+                and: [
+                    where,
+                    {
+                        endDate: null
+                    }
+                ]
+            },
+            options
+        );
+    }
+
+    async deleteById(id: string, options?: HistoryOptions): Promise<void> {
+        if (options && options.crud) {
+            return super.deleteById(id, options);
+        }
+
+        await this.deleteHistory({ id: id, endDate: null }, options);
     }
 }
