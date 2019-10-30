@@ -1,6 +1,6 @@
 {
     "name": "loopback-history-extension",
-    "version": "0.4.0",
+    "version": "1.0.0",
     "description": "DataModels with history extension for Loopback v4",
     "keywords": [
         "loopback-extension",
