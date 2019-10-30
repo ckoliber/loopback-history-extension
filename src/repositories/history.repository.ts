@@ -180,7 +180,7 @@ export class HistoryCrudRepository<
             {
                 ...filter,
                 where: {
-                    and: [filter && filter.where, endDateCondition]
+                    and: [filter && filter.where, { id: id }, endDateCondition]
                 }
             },
             options
