@@ -10,6 +10,7 @@ import {
 } from "@loopback/repository";
 
 import { HistoryEntity, HistoryEntityRelations } from "../models";
+import { Ctor } from "../types";
 
 export interface HistoryOptions extends Options {
     crud?: true;
@@ -19,13 +20,8 @@ export class HistoryCrudRepository<
     Model extends HistoryEntity,
     ModelRelations extends HistoryEntityRelations
 > extends DefaultCrudRepository<Model, string, ModelRelations> {
-    constructor(
-        entityClass: typeof HistoryEntity & {
-            prototype: Model;
-        },
-        dataSource: juggler.DataSource
-    ) {
-        super(entityClass, dataSource);
+    constructor(ctor: Ctor<Model>, dataSource: juggler.DataSource) {
+        super(ctor, dataSource);
     }
 
     /**
