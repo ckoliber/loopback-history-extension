@@ -11,12 +11,12 @@
         "node": ">=8.9"
     },
     "scripts": {
-        "prebuild": "lb-tsc --outDir build/out",
-        "build": "parcel build --target node --out-dir build build/out/index.js",
-        "postbuild": "lb-clean build/out",
         "start": "nodemon index.ts --exec ts-node",
-        "test": "lb-mocha --allow-console-logs \"build/__tests__\"",
-        "clean": "lb-clean build *.tsbuildinfo",
+        "prebuild": "lb-tsc --outDir build/temp",
+        "build": "parcel build --out-dir build --cache-dir build/temp/cache --target node build/temp/index.js",
+        "postbuild": "lb-clean build/temp",
+        "test": "lb-mocha --allow-console-logs \"test/**/*.test.ts\"",
+        "clean": "lb-clean build",
         "prepublishOnly": "npm run test"
     },
     "repository": {
