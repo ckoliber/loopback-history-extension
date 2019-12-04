@@ -1,6 +1,6 @@
 {
     "name": "loopback-history-extension",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "description": "DataModels with history extension for Loopback v4",
     "keywords": [
         "loopback-extension",
@@ -20,17 +20,18 @@
         "prepublishOnly": "npm run test"
     },
     "repository": {
-        "type": "git"
+        "type": "git",
+        "url": "https://github.com/koliberr136a1/loopback-history-extension"
     },
     "author": "KoLiBer",
     "license": "MIT",
     "files": [
         "README.md",
         "index.js",
-        "index.d.ts",
+        "index.ts",
         "build",
         "src",
-        "!*/__tests__"
+        "test"
     ],
     "dependencies": {
         "@loopback/boot": "^1.5.9",
