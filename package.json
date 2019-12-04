@@ -17,6 +17,7 @@
         "postbuild": "lb-clean build/temp",
         "test": "lb-mocha --allow-console-logs \"test/**/*.test.ts\"",
         "clean": "lb-clean build",
+        "prepublish": "npm run build",
         "prepublishOnly": "npm run test"
     },
     "repository": {
