@@ -3,7 +3,11 @@
     "extends": "@loopback/build/config/tsconfig.common.json",
     "compilerOptions": {
         "outDir": "build",
-        "rootDir": "src"
+        "rootDir": "src",
+        "baseUrl": ".",
+        "paths": {
+            "~*": ["./src/*"]
+        }
     },
     "include": ["src"]
 }
