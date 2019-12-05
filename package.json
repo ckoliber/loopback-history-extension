@@ -46,8 +46,5 @@
         "parcel-bundler": "^1.12.4",
         "source-map-support": "^0.5.16",
         "typescript": "~3.6.3"
-    },
-    "_moduleAliases": {
-        "~": "./dist"
     }
 }
