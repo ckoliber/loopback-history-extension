@@ -1,6 +1,6 @@
 {
     "name": "loopback-history-extension",
-    "version": "2.5.0",
+    "version": "3.0.0",
     "description": "DataModels with history extension for Loopback v4",
     "keywords": [
         "loopback-extension",
@@ -16,7 +16,8 @@
         "build": "lb-tsc --outDir dist",
         "postbuild": "parcel build --out-dir build --cache-dir build/cache --target node dist/index.js",
         "build:watch": "lb-tsc --watch --outDir dist",
-        "start": "nodemon .",
+        "start": "node .",
+        "start:watch": "nodemon .",
         "test": "lb-mocha --allow-console-logs \"test/**/*.test.ts\"",
         "prepublishOnly": "npm run build"
     },
