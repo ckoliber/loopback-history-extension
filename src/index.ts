@@ -1,7 +1,5 @@
-/** Fix path mapping in js: ~ */
-require("module-alias").addAliases({
-    "~": require("path").join(__dirname, "..", "dist")
-});
+/** Fix path mapping in js */
+require("module-alias/register");
 
 export * from "./types";
 
