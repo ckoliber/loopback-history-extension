@@ -4,3 +4,5 @@ import { Entity } from "@loopback/repository";
 export type Ctor<Model extends Entity> = typeof Entity & {
     prototype: Model;
 };
+
+export const a = 4;

@@ -1,6 +1,6 @@
 {
     "name": "loopback-history-extension",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "description": "DataModels with history extension for Loopback v4",
     "keywords": [
         "loopback-extension",
@@ -11,12 +11,12 @@
         "node": ">=8.9"
     },
     "scripts": {
-        "start": "nodemon index.ts --exec ts-node",
-        "prebuild": "lb-tsc --outDir build/typings",
-        "build": "parcel build --out-dir build --cache-dir build/cache --target node build/typings/index.js",
-        "postbuild": "lb-clean build/cache",
+        "clean": "lb-clean dist build",
+        "prebuild": "npm run clean",
+        "build": "lb-tsc --outDir dist",
+        "postbuild": "parcel build --out-dir build --cache-dir build/cache --target node dist/index.js",
+        "start": "nodemon --exec ts-node index.ts",
         "test": "lb-mocha --allow-console-logs \"test/**/*.test.ts\"",
-        "clean": "lb-clean build",
         "prepublishOnly": "npm run build"
     },
     "repository": {
@@ -26,10 +26,10 @@
     "author": "KoLiBer",
     "license": "MIT",
     "files": [
-        "build",
-        "index.d.ts",
+        "README.md",
         "index.js",
-        "README.md"
+        "index.d.ts",
+        "dist"
     ],
     "dependencies": {
         "@loopback/boot": "^1.5.12",
@@ -41,9 +41,13 @@
         "@loopback/build": "^2.1.0",
         "@loopback/testlab": "^1.9.5",
         "@types/node": "^10.17.6",
+        "module-alias": "^2.2.2",
         "nodemon": "^2.0.1",
         "parcel-bundler": "^1.12.4",
         "source-map-support": "^0.5.16",
         "typescript": "~3.6.3"
+    },
+    "_moduleAliases": {
+        "~": "./dist"
     }
 }
