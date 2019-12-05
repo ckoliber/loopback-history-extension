@@ -12,11 +12,11 @@
     },
     "scripts": {
         "start": "nodemon index.ts --exec ts-node",
-        "prebuild": "lb-tsc --outDir typings",
-        "build": "parcel build --out-dir build --cache-dir build/temp/cache --target node typings/index.js",
-        "postbuild": "lb-clean build/temp",
+        "prebuild": "lb-tsc --outDir build/typings",
+        "build": "parcel build --out-dir build --cache-dir build/cache --target node build/typings/index.js",
+        "postbuild": "lb-clean build/cache",
         "test": "lb-mocha --allow-console-logs \"test/**/*.test.ts\"",
-        "clean": "lb-clean build typings",
+        "clean": "lb-clean build",
         "prepublishOnly": "npm run build"
     },
     "repository": {
@@ -27,7 +27,6 @@
     "license": "MIT",
     "files": [
         "build",
-        "typings",
         "index.d.ts",
         "index.js",
         "README.md"
