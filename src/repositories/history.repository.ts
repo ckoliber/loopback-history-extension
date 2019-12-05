@@ -9,7 +9,9 @@ import {
     EntityNotFoundError
 } from "@loopback/repository";
 
-import { Ctor } from "~/types";
+import { Ctor, a } from "~/types";
+
+console.log(a);
 
 import { HistoryEntity, HistoryEntityRelations } from "~/models";
 
