@@ -1,5 +1,6 @@
+/** Fix path mapping in js: ~ */
 require("module-alias").addAliases({
-    "~": __dirname + "/../dist"
+    "~": require("path").join(__dirname, "..", "dist")
 });
 
 export * from "./types";
