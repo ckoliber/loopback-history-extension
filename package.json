@@ -1,6 +1,6 @@
 {
     "name": "loopback-history-extension",
-    "version": "2.4.0",
+    "version": "2.5.0",
     "description": "DataModels with history extension for Loopback v4",
     "keywords": [
         "loopback-extension",
@@ -11,7 +11,7 @@
         "node": ">=8.9"
     },
     "scripts": {
-        "clean": "lb-clean dist build",
+        "clean": "lb-clean dist build *.tsbuildinfo",
         "prebuild": "npm run clean",
         "build": "lb-tsc --outDir dist",
         "postbuild": "parcel build --out-dir build --cache-dir build/cache --target node dist/index.js",
