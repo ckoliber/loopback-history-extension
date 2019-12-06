@@ -1,6 +1,6 @@
 {
     "name": "loopback-history-extension",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "description": "DataModels with history extension for Loopback v4",
     "keywords": [
         "loopback-extension",
@@ -38,7 +38,7 @@
         "@loopback/context": "^1.24.0",
         "@loopback/core": "^1.11.0",
         "@loopback/repository": "^1.15.5",
-        "module-alias": "^2.2.2"
+        "better-module-alias": "^1.0.4"
     },
     "devDependencies": {
         "@loopback/build": "^2.1.0",
