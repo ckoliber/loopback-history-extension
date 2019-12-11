@@ -9,9 +9,9 @@ import {
     EntityNotFoundError
 } from "@loopback/repository";
 
-import { Ctor } from "~/types";
+import { Ctor } from "../types";
 
-import { HistoryEntity, HistoryEntityRelations } from "~/models";
+import { HistoryEntity, HistoryEntityRelations } from "../models";
 
 export interface HistoryOptions extends Options {
     crud?: true;
