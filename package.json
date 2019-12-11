@@ -37,8 +37,7 @@
         "@loopback/boot": "^1.5.12",
         "@loopback/context": "^1.24.0",
         "@loopback/core": "^1.11.0",
-        "@loopback/repository": "^1.15.5",
-        "better-module-alias": "^1.0.4"
+        "@loopback/repository": "^1.15.5"
     },
     "devDependencies": {
         "@loopback/build": "^2.1.0",
@@ -48,8 +47,5 @@
         "parcel-bundler": "^1.12.4",
         "source-map-support": "^0.5.16",
         "typescript": "~3.6.3"
-    },
-    "_moduleAliases": {
-        "~": "./dist"
     }
 }
