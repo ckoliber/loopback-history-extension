@@ -68,7 +68,7 @@ export class HistoryCrudRepository<
             return super.createAll(entities, options);
         }
 
-        return this.createHistory(entities, options);
+        return await this.createHistory(entities, options);
     }
 
     /**
@@ -134,7 +134,7 @@ export class HistoryCrudRepository<
             };
         }
 
-        return this.findHistory(Boolean(maxDate), historyFilter, options);
+        return await this.findHistory(Boolean(maxDate), historyFilter, options);
     }
 
     async findOne(
@@ -365,7 +365,7 @@ export class HistoryCrudRepository<
             historyFilter = { endDate: null };
         }
 
-        return this.updateHistory(data, false, historyFilter, options);
+        return await this.updateHistory(data, false, historyFilter, options);
     }
 
     async updateById(
@@ -415,7 +415,11 @@ export class HistoryCrudRepository<
          * where: {id:id,endDate:null}
          * update(where) => endDate: $now
          */
-        return super.updateAll({ endDate: new Date() }, where as any, options);
+        return await super.updateAll(
+            { endDate: new Date() },
+            where as any,
+            options
+        );
     }
 
     async delete(entity: Model, options?: HistoryOptions): Promise<void> {
@@ -448,7 +452,7 @@ export class HistoryCrudRepository<
             historyFilter = { endDate: null };
         }
 
-        return this.deleteHistory(historyFilter, options);
+        return await this.deleteHistory(historyFilter, options);
     }
 
     async deleteById(id: string, options?: HistoryOptions): Promise<void> {
