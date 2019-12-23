@@ -37,7 +37,7 @@ export class HistoryCrudRepository<
          */
         const date = new Date();
 
-        return super.createAll(
+        return await super.createAll(
             entities.map(entity => ({
                 ...entity,
                 uid: undefined,
