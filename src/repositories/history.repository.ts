@@ -116,19 +116,25 @@ export class HistoryCrudRepository<
         }
 
         const maxDate = options && options.maxDate;
-        const endDateCondition = {
-            endDate: maxDate ? { lt: maxDate } : null
-        };
-        return this.findHistory(
-            Boolean(maxDate),
-            {
+        const maxDateCondition = maxDate ? { lt: maxDate } : null;
+
+        /** Create history filter by endDate, id */
+        let historyFilter;
+        if (filter && filter.where) {
+            historyFilter = {
                 ...filter,
                 where: {
-                    and: [filter && filter.where, endDateCondition]
+                    and: [{ endDate: maxDateCondition }, filter.where]
                 }
-            },
-            options
-        );
+            };
+        } else {
+            historyFilter = {
+                ...filter,
+                where: { endDate: maxDateCondition }
+            };
+        }
+
+        return this.findHistory(Boolean(maxDate), historyFilter, options);
     }
 
     async findOne(
@@ -140,19 +146,30 @@ export class HistoryCrudRepository<
         }
 
         const maxDate = options && options.maxDate;
-        const endDateCondition = {
-            endDate: maxDate ? { lt: maxDate } : null
-        };
-        const result = await this.findHistory(
-            Boolean(maxDate),
-            {
+        const maxDateCondition = maxDate ? { lt: maxDate } : null;
+
+        /** Create history filter by endDate, id */
+        let historyFilter;
+        if (filter && filter.where) {
+            historyFilter = {
                 ...filter,
                 where: {
-                    and: [filter && filter.where, endDateCondition]
+                    and: [{ endDate: maxDateCondition }, filter.where]
                 }
-            },
+            };
+        } else {
+            historyFilter = {
+                ...filter,
+                where: { endDate: maxDateCondition }
+            };
+        }
+
+        const result = await this.findHistory(
+            Boolean(maxDate),
+            historyFilter,
             options
         );
+
         if (result[0]) {
             return result[0];
         }
@@ -169,19 +186,39 @@ export class HistoryCrudRepository<
         }
 
         const maxDate = options && options.maxDate;
-        const endDateCondition = {
-            endDate: maxDate ? { lt: maxDate } : null
-        };
-        const result = await this.findHistory(
-            Boolean(maxDate),
-            {
+        const maxDateCondition = maxDate ? { lt: maxDate } : null;
+
+        /** Create history filter by endDate, id */
+        let historyFilter;
+        if (filter && filter.where) {
+            historyFilter = {
                 ...filter,
                 where: {
-                    and: [filter && filter.where, { id: id }, endDateCondition]
+                    and: [
+                        {
+                            id: id,
+                            endDate: maxDateCondition
+                        },
+                        filter.where
+                    ]
                 }
-            },
+            };
+        } else {
+            historyFilter = {
+                ...filter,
+                where: {
+                    id: id,
+                    endDate: maxDateCondition
+                }
+            };
+        }
+
+        const result = await this.findHistory(
+            Boolean(maxDate),
+            historyFilter,
             options
         );
+
         if (result[0]) {
             return result[0];
         }
@@ -197,18 +234,28 @@ export class HistoryCrudRepository<
         }
 
         const maxDate = options && options.maxDate;
-        const endDateCondition = {
-            endDate: maxDate ? { lt: maxDate } : null
-        };
+        const maxDateCondition = maxDate ? { lt: maxDate } : null;
+
+        /** Create history filter by endDate, id */
+        let historyFilter;
+        if (where) {
+            historyFilter = {
+                where: {
+                    and: [{ endDate: maxDateCondition }, where]
+                }
+            };
+        } else {
+            historyFilter = {
+                where: { endDate: maxDateCondition }
+            };
+        }
+
         const result = await this.findHistory(
             Boolean(maxDate),
-            {
-                where: {
-                    and: [where, endDateCondition]
-                }
-            },
+            historyFilter,
             options
         );
+
         return {
             count: result.length
         };
@@ -220,18 +267,22 @@ export class HistoryCrudRepository<
         }
 
         const maxDate = options && options.maxDate;
-        const endDateCondition = {
-            endDate: maxDate ? { lt: maxDate } : null
+        const maxDateCondition = maxDate ? { lt: maxDate } : null;
+
+        /** Create history filter by endDate, id */
+        let historyFilter = {
+            where: {
+                id: id,
+                endDate: maxDateCondition
+            }
         };
+
         const result = await this.findHistory(
             Boolean(maxDate),
-            {
-                where: {
-                    and: [{ id: id }, endDateCondition]
-                }
-            },
+            historyFilter,
             options
         );
+
         if (result[0]) {
             return true;
         }
@@ -275,7 +326,7 @@ export class HistoryCrudRepository<
         );
 
         return await super.updateAll(
-            { endDate: date } as any,
+            { endDate: date },
             {
                 uid: { inq: entities.map(entity => entity.uid) }
             } as any,
@@ -288,14 +339,13 @@ export class HistoryCrudRepository<
             return super.update(entity, options);
         }
 
-        await this.updateHistory(
-            entity,
-            false,
-            {
-                and: [{ id: entity.id }, { endDate: null }]
-            },
-            options
-        );
+        /** Create history filter by endDate, id */
+        let historyFilter = {
+            id: entity.id,
+            endDate: null
+        };
+
+        await this.updateHistory(entity, false, historyFilter, options);
     }
 
     async updateAll(
@@ -307,14 +357,15 @@ export class HistoryCrudRepository<
             return super.updateAll(data, where, options);
         }
 
-        return this.updateHistory(
-            data,
-            false,
-            {
-                and: [where, { endDate: null }]
-            },
-            options
-        );
+        /** Create history filter by endDate, id */
+        let historyFilter;
+        if (where) {
+            historyFilter = { and: [{ endDate: null }, where] };
+        } else {
+            historyFilter = { endDate: null };
+        }
+
+        return this.updateHistory(data, false, historyFilter, options);
     }
 
     async updateById(
@@ -326,14 +377,13 @@ export class HistoryCrudRepository<
             return super.updateById(id, data, options);
         }
 
-        await this.updateHistory(
-            data,
-            false,
-            {
-                and: [{ id: id }, { endDate: null }]
-            },
-            options
-        );
+        /** Create history filter by endDate, id */
+        let historyFilter = {
+            id: id,
+            endDate: null
+        };
+
+        await this.updateHistory(data, false, historyFilter, options);
     }
 
     async replaceById(
@@ -345,14 +395,13 @@ export class HistoryCrudRepository<
             return super.replaceById(id, data, options);
         }
 
-        await this.updateHistory(
-            data,
-            true,
-            {
-                and: [{ id: id }, { endDate: null }]
-            },
-            options
-        );
+        /** Create history filter by endDate, id */
+        let historyFilter = {
+            id: id,
+            endDate: null
+        };
+
+        await this.updateHistory(data, true, historyFilter, options);
     }
 
     /**
@@ -366,11 +415,7 @@ export class HistoryCrudRepository<
          * where: {id:id,endDate:null}
          * update(where) => endDate: $now
          */
-        return super.updateAll(
-            { endDate: new Date() } as any,
-            where as any,
-            options
-        );
+        return super.updateAll({ endDate: new Date() }, where as any, options);
     }
 
     async delete(entity: Model, options?: HistoryOptions): Promise<void> {
@@ -378,12 +423,13 @@ export class HistoryCrudRepository<
             return super.delete(entity, options);
         }
 
-        await this.deleteHistory(
-            {
-                and: [{ id: entity.id }, { endDate: null }]
-            },
-            options
-        );
+        /** Create history filter by endDate, id */
+        let historyFilter = {
+            id: entity.id,
+            endDate: null
+        };
+
+        await this.deleteHistory(historyFilter, options);
     }
 
     async deleteAll(
@@ -394,12 +440,15 @@ export class HistoryCrudRepository<
             return super.deleteAll(where, options);
         }
 
-        return this.deleteHistory(
-            {
-                and: [where, { endDate: null }]
-            },
-            options
-        );
+        /** Create history filter by endDate, id */
+        let historyFilter;
+        if (where) {
+            historyFilter = { and: [{ endDate: null }, where] };
+        } else {
+            historyFilter = { endDate: null };
+        }
+
+        return this.deleteHistory(historyFilter, options);
     }
 
     async deleteById(id: string, options?: HistoryOptions): Promise<void> {
@@ -407,11 +456,12 @@ export class HistoryCrudRepository<
             return super.deleteById(id, options);
         }
 
-        await this.deleteHistory(
-            {
-                and: [{ id: id }, { endDate: null }]
-            },
-            options
-        );
+        /** Create history filter by endDate, id */
+        let historyFilter = {
+            id: id,
+            endDate: null
+        };
+
+        await this.deleteHistory(historyFilter, options);
     }
 }
