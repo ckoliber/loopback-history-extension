@@ -19,19 +19,30 @@ export interface HistoryOptions extends Options {
     maxDate?: Date;
 }
 
+/**
+ * Repository Class Type
+ */
+export class HistoryCrudRepository<
+    Model extends HistoryEntity,
+    ModelRelations extends HistoryEntityRelations
+> extends DefaultCrudRepository<Model, string, ModelRelations> {}
+
+/**
+ * Repository Mixin
+ */
 export function HistoryCrudRepositoryMixin<
     Model extends HistoryEntity,
     ModelRelations extends HistoryEntityRelations
 >(
     superClass?: Class<DefaultCrudRepository<Model, string, ModelRelations>>
-): Class<DefaultCrudRepository<Model, string, ModelRelations>> {
+): Class<HistoryCrudRepository<Model, ModelRelations>> {
     if (!superClass) {
         superClass = DefaultCrudRepository as Class<
             DefaultCrudRepository<Model, string, ModelRelations>
         >;
     }
 
-    class HistoryCrudRepository extends superClass {
+    class Repository extends superClass {
         constructor(ctor: Ctor<Model>, dataSource: juggler.DataSource) {
             super(ctor, dataSource);
         }
@@ -490,5 +501,5 @@ export function HistoryCrudRepositoryMixin<
         }
     }
 
-    return HistoryCrudRepository;
+    return Repository;
 }
