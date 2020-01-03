@@ -61,7 +61,7 @@ export class User extends Entity {
 To:
 
 ```ts
-import {} from "loopback-history-extension";
+import { HistoryEntity } from "loopback-history-extension";
 
 @model()
 export class User extends HistoryEntity {
@@ -112,9 +112,9 @@ export class User extends HistoryEntity {
 
 ---
 
-### History Repository
+### History Repository Mixin
 
-Change your repository parent class from `DefaultCrudRepository` to `HistoryCrudRepository`
+Change your repository parent class from `DefaultCrudRepository` to `HistoryCrudRepositoryMixin()`
 
 #### Example
 
@@ -133,9 +133,12 @@ export class UserRepository extends DefaultCrudRepository<
 To:
 
 ```ts
-import { HistoryCrudRepository } from "loopback-history-extension";
+import { HistoryCrudRepositoryMixin } from "loopback-history-extension";
 
-export class UserRepository extends HistoryCrudRepository<User, UserRelations> {
+export class UserRepository extends HistoryCrudRepositoryMixin<
+    User,
+    UserRelations
+>() {
     // ...
 }
 ```
