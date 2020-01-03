@@ -42,7 +42,7 @@ export function HistoryCrudRepositoryMixin<
         >;
     }
 
-    return class extends superClass {
+    class Repository extends superClass {
         constructor(ctor: Ctor<Model>, dataSource: juggler.DataSource) {
             super(ctor, dataSource);
         }
@@ -499,5 +499,7 @@ export function HistoryCrudRepositoryMixin<
 
             await this.deleteHistory(historyFilter, options);
         }
-    };
+    }
+
+    return Repository;
 }
