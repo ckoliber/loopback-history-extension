@@ -114,7 +114,7 @@ export class User extends HistoryEntity {
 
 ### History Repository Mixin
 
-Change your repository parent class from `DefaultCrudRepository` to `HistoryCrudRepositoryMixin()`
+Change your repository parent class from `DefaultCrudRepository` to `HistoryCrudRepositoryMixin()()`
 
 #### Example
 
@@ -138,7 +138,7 @@ import { HistoryCrudRepositoryMixin } from "loopback-history-extension";
 export class UserRepository extends HistoryCrudRepositoryMixin<
     User,
     UserRelations
->() {
+>()() {
     // ...
 }
 ```
