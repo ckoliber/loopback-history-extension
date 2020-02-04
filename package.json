@@ -1,6 +1,6 @@
 {
     "name": "loopback-history-extension",
-    "version": "5.5.0",
+    "version": "6.0.0",
     "description": "DataModels with history extension for Loopback v4",
     "keywords": [
         "loopback-extension",
@@ -41,7 +41,7 @@
     "devDependencies": {
         "@loopback/build": "^3.1.0",
         "@loopback/testlab": "^1.10.2",
-        "@types/node": "^10.17.14",
+        "@types/node": "^10.17.13",
         "nodemon": "^2.0.2",
         "source-map-support": "^0.5.16",
         "typescript": "~3.7.5"
